@@ -34,6 +34,10 @@ class CInt:
         """Returns a printable representation of the value."""
         return str(self.value)
 
+    def __repr__(self) -> repr:
+        """Similar to str function, but returns a more technical description of the class."""
+        return repr(self.value)
+
     def __add__(self, other: CInt) -> CInt:
         """
         Returns the result from adding this CInt's value to the other CInt's value.

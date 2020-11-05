@@ -79,6 +79,7 @@ class SRPNCalculator:
             raise e
 
     def _get_input(self) -> UserInput:
+        """Waits here for input via the terminal and encapsulates it in the the UserInput class."""
         return UserInput(input(), is_commenting=self._is_commenting)
 
     def _process_element(self, element: str) -> None:
@@ -112,12 +113,13 @@ class SRPNCalculator:
             return
 
     def _process_operator(self, operator: callable) -> None:
+        """More specifically over processing an individual element, this processes a specific mathematical operator."""
         n1, n2 = self._stack.pop_many(2)  # Take the top two elements off the stack and apply the operator to them.
         try:
             self._stack.push(operator(n1, n2))
         except OperatorException as e:
-            # An mathematical error should'nt crash the program.
-            # Will print what went wrong to terminal to make user aware.
+            # Any mathematical error should not crash the program.
+            # However, we will print what went wrong to terminal to make user aware.
             print(e)
             # If an error occurs during the operation, push the two CInts back onto the stack.
             self._stack.push_many((n1, n2))

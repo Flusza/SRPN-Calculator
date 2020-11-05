@@ -13,31 +13,21 @@ class UserInput:
     is_commenting: Optional[bool]
         A bool to determine whether or not the user is currently writing a comment. As comments can be multiline,
         we must keep the state consistent between lines. Defaults to False.
-
-    Attributes
-    ----------
-    parsed: bool
-        A bool as to whether or not the raw_input has been parsed into individual elements already.
-    is_commenting: bool
-        Whether or not comment mode is currently on/off
-
-    Methods
-    -------
-    get_parsed_input()
     """
     def __init__(self, raw_input: str, is_commenting: bool = False) -> None:
         self._raw_string = raw_input  # The raw string that was entered by the user into the terminal.
-
-        self.is_commenting = is_commenting
-        self.parsed = False
-        self._parsed_elements = []
+        self._parsed_elements = []  # Individual elements extracted from the string. Populated in the _parse function.
+        self.is_commenting = is_commenting  # Whether or not comment mode is currently on/off.
+        self.parsed = False  # Bool whether or not the raw_input has been parsed into individual elements already.
 
     def __repr__(self) -> repr:
+        """A """
         if self.parsed:
-            return repr(self._parsed_elements)
-        return self._raw_string
+            return repr(f"Parsed Elements<{self._parsed_elements}>")
+        return repr(f"Unparsed String<{self._raw_string}>")
 
     def get_parsed_input(self) -> typing.List[str]:
+        """Returns the list of parsed_elements extracted from the raw_input string."""
         if self.parsed:  # If already parsed, don't do this again unnecessarily.
             return self._parsed_elements
 
@@ -45,6 +35,16 @@ class UserInput:
         return self._parse()
 
     def _parse(self) -> typing.List[str]:
+        """Handles all the logic necessary for parsing the raw string. The string is split up into elements.
+        Elements which are stored in the parsed_elements list:
+            - A single (<10) or series of digits (>10), forming one integer.
+            - A single letter or symbol.
+        Elements which aren't stored in the list:
+            - White space (space, tab enter, etc).
+            - A hashtag '#'. This does however, toggle the bool `is_commenting`.
+
+        Returns the list of parsed elements. Note: This could be empty.
+            """
         number_construct = ''
         parsed_elements = []
         for next_char in self._get_next_char():
@@ -82,5 +82,6 @@ class UserInput:
         return self._parsed_elements
 
     def _get_next_char(self) -> typing.Iterator[str]:
+        """A generator function which yields each char from the raw_input string."""
         for char in self._raw_string:
             yield char
