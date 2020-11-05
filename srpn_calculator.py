@@ -59,8 +59,7 @@ class SRPNCalculator:
         """A loop which continues to wait for and process user input."""
         try:
             while self._running:
-                user_input = self._get_input()  # Wait for input from user.
-                # Parse input, splitting up different commands or numbers into individual elements in a list.
+                user_input = self._get_input()
                 parsed_input = user_input.get_parsed_input()
 
                 # Multiline comments are allowed in the calculator.
