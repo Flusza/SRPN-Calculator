@@ -98,27 +98,21 @@ class CInt:
         new_value = self.value ** other.value
         return CInt(new_value)
 
-    # Equality functions.
+    # Equality functions. https://docs.python.org/3/reference/datamodel.html#object.__lt__
     def __eq__(self, other: CInt) -> bool:
-        """Returns true if other CInt holds the same value as this. Otherwise False"""
         return self.value == other.value
 
     def __ne__(self, other: CInt) -> bool:
-        """Returns true if other CInt holds a different value to this. Otherwise False"""
         return self.value != other.value
 
     def __lt__(self, other: CInt) -> bool:
-        """Returns true if this value is less than the other. Otherwise False"""
         return self.value < other.value
 
     def __le__(self, other: CInt) -> bool:
-        """Returns true if this value is less than or equal to the. Otherwise False"""
         return self.value <= other.value
 
     def __gt__(self, other: CInt) -> bool:
-        """Returns true if this value is greater than the other. Otherwise False"""
         return self.value > other.value
 
     def __ge__(self, other: CInt) -> bool:
-        """Returns true if this value is greater than or equal to the other. Otherwise False"""
         return self.value >= other.value
