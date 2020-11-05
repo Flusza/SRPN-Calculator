@@ -20,9 +20,6 @@ class Stack:
     def __len__(self) -> int:
         return len(self._values)
 
-    def __repr__(self) -> repr:
-        return repr(self._values)
-
     def __str__(self) -> str:
         return str(self._values)
 
