@@ -39,39 +39,34 @@ class CInt:
         return repr(self.value)
 
     def __add__(self, other: CInt) -> CInt:
-        """
-        Returns the result from adding this CInt's value to the other CInt's value.
+        """Returns the result from adding this CInt's value to the other CInt's value.
         this + other
         """
         new_value = self.value + other.value
         return CInt(new_value)
 
     def __sub__(self, other: CInt) -> CInt:
-        """
-        Returns the result from subtracting this CInt's value by the other CInt's value.
+        """Returns the result from subtracting this CInt's value by the other CInt's value.
         this - other.
         """
         new_value = self.value - other.value
         return CInt(new_value)
 
     def __mul__(self, other: CInt) -> CInt:
-        """
-        Returns the multiplication product from this CInt's value and the other CInt's value.
+        """Returns the multiplication product from this CInt's value and the other CInt's value.
         this * other.
         """
         new_value = self.value * other.value
         return CInt(new_value)
 
     def __truediv__(self, other: CInt) -> CInt:
-        """
-        CInt can't handle true division (with a remainder value).
+        """CInt can't handle true division (with a remainder value).
         If called, process as a floor division instead (no remainder).
         """
         return self.__floordiv__(other)
 
     def __floordiv__(self, other: CInt) -> CInt:
-        """
-        Returns the whole number value when dividing this CInt's value by the other CInt's value.
+        """Returns the whole number value when dividing this CInt's value by the other CInt's value.
         Remainder is ignored.
         this // other.
         """
@@ -82,8 +77,7 @@ class CInt:
         return CInt(new_value)
 
     def __mod__(self, other: CInt) -> CInt:
-        """
-        Returns the remainder from dividing this CInt's value by the other CInt's value.
+        """Returns the remainder from dividing this CInt's value by the other CInt's value.
         this % other.
         Raises `DivideByZero` should the denominator be == 0.
         """
@@ -94,8 +88,7 @@ class CInt:
         return CInt(new_value)
 
     def __pow__(self, other: CInt) -> CInt:
-        """
-        Returns the resulting value after raising this CInt's value to the power denoted by the other CInt's value.
+        """Returns the resulting value after raising this CInt's value to the power denoted by the other CInt's value.
         this ^ other.
         Raises `NegativePower` should the other power be less than 0.
         """
