@@ -68,7 +68,6 @@ class SRPNCalculator:
                 self._is_commenting = user_input.is_commenting
 
                 for element in parsed_input:
-                    #  Process each number, operator or command individually.
                     self._process_element(element)
 
         except KeyboardInterrupt:
@@ -121,6 +120,5 @@ class SRPNCalculator:
             # Any mathematical error should not crash the program.
             # However, we will print what went wrong to terminal to make user aware.
             print(e)
-            # If an error occurs during the operation, push the two CInts back onto the stack.
             self._stack.push_many((n1, n2))
 
