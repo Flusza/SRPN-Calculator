@@ -134,6 +134,9 @@ class SRPNCalculator:
                 current_string = next_string
 
     def _check_to_execute_operator_chain(self, next_string: str, operator_chain: list) -> list:
+        """Check if conditions are right to execute a chain of operators.
+        Chains are created through a chain of operators and equal signs.
+        """
         try:
             if len(operator_chain) > 0:
                 if next_string in (' ', 'd'):
