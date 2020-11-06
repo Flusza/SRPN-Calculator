@@ -57,7 +57,7 @@ class SRPNCalculator:
         """Process an individual element that the user inputted."""
         previous_string = ' '
         current_string = ' '
-        # There is strange functionality when a math operator preceeds an equals.
+        # There is strange functionality when a math operator proceeds an equals.
         # In any 'chain' of operators and equals, the SRPN calculator executes all equals first and the operators after.
         # Therefore we need to store what operators we have encountered and execute them afterwards.
         operator_chain = []
