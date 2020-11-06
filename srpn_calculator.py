@@ -61,21 +61,20 @@ class SRPNCalculator:
         # In any 'chain' of operators and equals, the SRPN calculator executes all equals first and the operators after.
         # Therefore we need to store what operators we have encountered and execute them afterwards.
         operator_chain = []
-        for next_string in parsed_string:
-            print(f"{next_string}, {self._is_commenting}")
+        for n, next_string in enumerate(parsed_string):
             try:
                 if current_string == '#':
                     if previous_string == ' ' and next_string == ' ':
                         # A hashtag surrounded by white space or at start/end of a line will toggle commenting mode.
                         self._is_commenting = not self._is_commenting
-                        return
+                        continue
                     else:
                         raise InvalidInput(current_string)
 
                 if self._is_commenting:
-                    continue  # If we are commenting, we can ignore the input.
+                    pass  # If we are commenting, we can ignore the input.
 
-                if current_string == ' ':
+                elif current_string == ' ':
                     pass  # Do nothing
 
                 elif current_string.isdigit():
