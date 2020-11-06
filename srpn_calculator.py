@@ -61,7 +61,7 @@ class SRPNCalculator:
         # In any 'chain' of operators and equals, the SRPN calculator executes all equals first and the operators after.
         # Therefore we need to store what operators we have encountered and execute them afterwards.
         operator_chain = []
-        for n, next_string in enumerate(parsed_string):
+        for next_string in parsed_string:
             try:
                 if current_string == '#':
                     if previous_string == ' ' and next_string == ' ':
