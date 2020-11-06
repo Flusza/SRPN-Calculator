@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import sys
+
 from c_integer import CInt
 from random_number_generator import RandomNumberGenerator
-from stack import Stack
+from stack import CIntStack, StringStack
 from user_input import UserInput
 from utility import operator_map
 from exceptions import (
     SRPNException,
     InvalidInput,
+    ModulusByZero,
     StackException,
     OperatorException,
     StackOverflow
@@ -34,7 +37,7 @@ class SRPNCalculator:
         Silently stops the calculator on the next iteration of the loop.
     """
     def __init__(self, max_stack_size: int = None, rng_index: int = 0) -> None:
-        self._stack = Stack(max_size=max_stack_size)
+        self._stack = CIntStack(max_size=max_stack_size)
         self._rng = RandomNumberGenerator(index=rng_index)
         self._is_commenting = False  # Bool as to whether or not the user is currently writing comments using a '#'.
         self._running = False  # Bool as to whether or not the calculator is currently running.
@@ -59,16 +62,11 @@ class SRPNCalculator:
         """A loop which continues to wait for and process user input."""
         try:
             while self._running:
-                user_input = self._get_input()
+                user_input = UserInput(input())
+                # We need to split the raw string up into elements. Group numbers >9 together and clean up white space.
                 parsed_input = user_input.get_parsed_input()
-
-                # Multiline comments are allowed in the calculator.
-                # We must store between inputs whether the last line was in the process of commenting or not.
-                self._is_commenting = user_input.is_commenting
-
-                for element in parsed_input:
-                    self._process_element(element)
-
+                # Process the input now it is nicely split up.
+                self._process_parsed_string(parsed_input)
         except KeyboardInterrupt:
             self.stop()
 
@@ -76,39 +74,75 @@ class SRPNCalculator:
             self.stop()
             raise e
 
-    def _get_input(self) -> UserInput:
-        """Waits here for input via the terminal and encapsulates it in the the UserInput class."""
-        return UserInput(input(), is_commenting=self._is_commenting)
-
-    def _process_element(self, element: str) -> None:
+    def _process_parsed_string(self, parsed_string: StringStack) -> None:
         """Process an individual element that the user inputted."""
+        previous_string = ' '
+        current_string = ' '
+        # There is strange functionality when a math operator preceeds an equals.
+        # In any 'chain' of operators and equals, the SRPN calculator executes all equals first and the operators after.
+        # Therefore we need to store what operators we have encountered and execute them afterwards.
+        operator_chain = []
+        for next_string in parsed_string:
+            try:
+                if current_string == '#':
+                    if previous_string == ' ' and next_string == ' ':
+                        # A hashtag surrounded by white space or at start/end of a line will toggle commenting mode.
+                        self._is_commenting = not self._is_commenting
+                        return
+                    else:
+                        raise InvalidInput(current_string)
+
+                if self._is_commenting:
+                    continue  # If we are commenting, we can ignore the input.
+
+                if current_string == ' ':
+                    pass  # Do nothing
+
+                elif current_string.isdigit():
+                    self._stack.push(CInt(int(current_string)))
+
+                elif current_string == '=':
+                    print(self._stack.peek())
+
+                elif current_string == 'r':  # User wants a 'random' number. Generate one and push it onto the stack.
+                    if self._stack.is_full:  # We will only generate a random number if the stack isn't full.
+                        raise StackOverflow()
+                    self._stack.push(self._rng.next())
+
+                elif current_string == 'd':  # Display all the elements on the stack line by line.
+                    for item in self._stack.show():
+                        print(item)
+
+                elif operator := operator_map.get(current_string):  # User inputted a mathematical symbol.
+                    if next_string != '=':  # Operator can do normal functionality
+                        self._process_operator(operator)
+                    else:  # Weird functionality when operator proceeds an equals.
+                        operator_chain.append(operator)
+
+                else:  # If input reaches here, we can ignore it and make the user aware with this error.
+                    raise InvalidInput(current_string)
+
+            except (StackException, InvalidInput) as e:
+                # Any user caused errors should not cause the program to crash.
+                # We will simply print the error to the terminal to make the user aware.
+                print(e)
+            finally:
+                # End of each element, check if conditions are right to run the operator chain.
+                operator_chain = self._check_to_execute_operator_chain(next_string, operator_chain)
+                # Update variables for the next iteration.
+                previous_string = current_string
+                current_string = next_string
+
+    def _check_to_execute_operator_chain(self, next_string: str, operator_chain: list) -> list:
         try:
-            if element.isdigit():  # User inputted a number. Push it onto the stack.
-                self._stack.push(CInt(int(element)))
-
-            elif operator := operator_map.get(element):  # User inputted a mathematical symbol.
-                self._process_operator(operator)
-
-            elif element == 'r':  # User wants a 'random' number. Generate one and push it onto the stack.
-                if self._stack.is_full:  # We will only generate a random number if the stack isn't full.
-                    raise StackOverflow()
-                self._stack.push(self._rng.next())
-
-            elif element == '=':  # User wants to see the top item in the stack.
-                print(self._stack.peek())
-
-            elif element == 'd':  # Display all the elements on the stack line by line.
-                for item in self._stack.show():
-                    print(item)
-
-            else:  # If input reaches here, we can ignore it and make the user aware with this error.
-                raise InvalidInput(element)
-
-        except (StackException, InvalidInput) as e:
-            # Any user caused errors should not cause the program to crash.
-            # We will simply print the error to the terminal to make the user aware.
+            if len(operator_chain) > 0:
+                if next_string in (' ', 'd'):
+                    for operator in operator_chain:
+                        self._process_operator(operator)
+                    operator_chain = []
+        except StackException as e:
             print(e)
-            return
+        return operator_chain
 
     def _process_operator(self, operator: callable) -> None:
         """More specifically over processing an individual element, this processes a specific mathematical operator."""
@@ -120,4 +154,6 @@ class SRPNCalculator:
             # However, we will print what went wrong to terminal to make user aware.
             print(e)
             self._stack.push_many((n1, n2))
-
+            if isinstance(e, ModulusByZero):
+                self.stop()
+                sys.exit(0)

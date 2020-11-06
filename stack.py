@@ -1,6 +1,7 @@
 from __future__ import annotations
 import sys
 import typing
+import abc
 
 from c_integer import CInt
 from exceptions import (
@@ -10,24 +11,46 @@ from exceptions import (
 )
 
 
-class Stack:
+class ABCStack(abc.ABC):
     """Represents the abstract data type: stack.
     Items can only be added (pushed) or removed (popped) to this stack from the top.
 
     Parameters
     ----------
-    values: Optional[Iterable[CInt]]
+    values: Optional[Iterable[stack_value_type]]
         A list of values to pre-populate the stack with.
     max_size: Optional[Int]
         The maximum number of items the stack can hold. Defaults to the value returned by sys.maxsize.
         This value should not be changed after instantiation, because this class does not have functionality to
         truncate the list of values to be under this limit should it change.
     """
-    def __init__(self, values: typing.Iterable[CInt] = None, max_size: int = None) -> None:
+    def __init__(self, values: typing.Iterable[stack_value_type] = None, max_size: int = None) -> None:
         self.max_size = max_size if max_size else sys.maxsize
         self._values = []
         if values:
             self.push_many(values)
+
+    @property
+    @abc.abstractmethod
+    def stack_value_type(self):
+        """This must be overridden as a class attribute in any subclass. Else `TypeError` will be raised."""
+        pass
+
+    def __next__(self) -> stack_value_type:
+        """Keeps popping values from the top of the stack until no more values exist.
+        `StopIteration` can be caught for when the stack empties."""
+        try:
+            return self.pop(index=0)
+        except StackUnderflow:
+            raise StopIteration()
+
+    def __iter__(self) -> ABCStack:
+        """This method is implemented so you can use this class like an Iterator."""
+        return self
+
+    def next(self) -> stack_value_type:
+        """Requests the generator to yield the next value from the top of the stack.."""
+        return self.__next__()
 
     def __len__(self) -> int:
         """Returns the number of items currently in the stack"""
@@ -37,11 +60,11 @@ class Stack:
         """Returns a string-like representation of the list of items in the stack"""
         return str(self._values)
 
-    def __eq__(self, other: Stack) -> bool:
+    def __eq__(self, other: ABCStack) -> bool:
         """Returns True if the values and max_size in both stacks are the same. Otherwise False."""
         return self._values == other._values and self.max_size == other.max_size
 
-    def __ne__(self, other: Stack) -> bool:
+    def __ne__(self, other: ABCStack) -> bool:
         """Returns True if the values or max_size in both stacks are different. Otherwise False."""
         return not self.__eq__(other)
 
@@ -60,10 +83,10 @@ class Stack:
         """Returns as an integer, the number of values currently in the stack"""
         return len(self._values)
 
-    def show(self) -> typing.List[CInt]:
+    def show(self) -> typing.List[stack_value_type]:
         """Returns a list of values contained in the Stack."""
         if self.is_empty:  # Pressing d before pushing anything to the stack, returns the lowest possible number.
-            return [CInt(CInt.min_value), ]
+            raise StackEmpty()
 
         return self._values
 
@@ -72,30 +95,31 @@ class Stack:
         if not self.is_empty:
             self._values = []
 
-    def push(self, value: CInt) -> None:
-        """Push a single CInt to the top of the stack.
-        Raises `ValueError` should the type not be a CInt.
+    def push(self, value: stack_value_type) -> None:
+        """Push a single value to the top of the stack.
+        Raises `ValueError` should the type not match that set in stack_value_type.
         Raises `StackOverflow` if the stack is already full.
         """
-        if not isinstance(value, CInt):
-            raise ValueError('Value is not a CInt')
+        if not isinstance(value, self.stack_value_type):
+            raise ValueError(f'Value is not of type {self.stack_value_type}.')
 
         if self.count >= self.max_size:
             raise StackOverflow()
 
         self._values.append(value)
 
-    def pop(self) -> CInt:
-        """Removes and returns a single CInt from the top the stack.
+    def pop(self, index: int = -1) -> stack_value_type:
+        """Removes and returns a single value from the top the stack.
+        Index can be used to pop from a different place of the stack, however this isn't recommended.
         Raises `StackUnderflow` if the stack is empty.
         """
         if self.is_empty:
             raise StackUnderflow()
 
-        return self._values.pop(-1)
+        return self._values.pop(index)
 
-    def peek(self) -> CInt:
-        """Returns the top CInt from the stack
+    def peek(self) -> stack_value_type:
+        """Returns the top value from the stack
         Raises `StackEmpty` if the stack is empty.
         """
         if self.is_empty:
@@ -103,7 +127,7 @@ class Stack:
 
         return self._values[-1]
 
-    def push_many(self, values: typing.Iterable[CInt]) -> None:
+    def push_many(self, values: typing.Iterable[stack_value_type]) -> None:
         """Same functionality as `push`, but for multiple values. Adds then sequentially."""
         if not isinstance(values, typing.Iterable):
             raise ValueError('Values should be an iterable')
@@ -111,7 +135,7 @@ class Stack:
         for value in values:
             self.push(value)
 
-    def pop_many(self, n: int) -> typing.List[CInt]:
+    def pop_many(self, n: int) -> typing.List[stack_value_type]:
         """Same functionality as `pop`, but for multiple values. Maintains their order."""
         if n > self.count:
             raise StackUnderflow()
@@ -121,7 +145,7 @@ class Stack:
             values.append(self.pop())
         return list(reversed(values))
 
-    def peek_many(self, n: int) -> typing.List[CInt]:
+    def peek_many(self, n: int) -> typing.List[stack_value_type]:
         """Same functionality as `peek`, but for multiple values. Maintains their order."""
         if n < 1:  # An integer less than 1 would return a value from the back of the stack. This shouldn't be possible.
             raise ValueError("Can't peek from back to front.")
@@ -133,3 +157,21 @@ class Stack:
         for i in range(-1, -n - 1, -1):  # range(start, stop, step).
             values.insert(0, self._values[i])
         return values
+
+
+class CIntStack(ABCStack):
+    """Represents a stack of CInts."""
+    stack_value_type = CInt
+
+    def show(self) -> typing.List[stack_value_type]:
+        """Returns a list of values contained in the Stack."""
+        if self.is_empty:  # Override normal functionality to return the minimum value instead of raising `StackEmpty`.
+            return [CInt(CInt.min_value), ]
+
+        return self._values
+
+
+class StringStack(ABCStack):
+    """Used to represent a stack of strings."""
+    stack_value_type = str
+

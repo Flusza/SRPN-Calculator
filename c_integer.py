@@ -1,7 +1,7 @@
 from __future__ import annotations
 import typing
 
-from exceptions import DivideByZero, NegativePower
+from exceptions import DivideByZero, ModulusByZero, NegativePower
 
 
 class CInt:
@@ -82,7 +82,7 @@ class CInt:
         Raises `DivideByZero` should the denominator be == 0.
         """
         if other.value == 0:
-            raise DivideByZero()
+            raise ModulusByZero()
 
         new_value = self.value % other.value
         return CInt(new_value)
