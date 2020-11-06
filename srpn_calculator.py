@@ -28,51 +28,30 @@ class SRPNCalculator:
         The maximum number of elements the `Stack` can hold.
     rng_index: Optional[int]
         The index to start the `RandomNumberGenerator` on. Defaults to 0 (the start).
-
-    Methods
-    -------
-    start()
-        Starts the calculator and enters a blocking loop of waiting for and processing user input via the terminal.
-    stop()
-        Silently stops the calculator on the next iteration of the loop.
     """
     def __init__(self, max_stack_size: int = None, rng_index: int = 0) -> None:
         self._stack = CIntStack(max_size=max_stack_size)
         self._rng = RandomNumberGenerator(index=rng_index)
         self._is_commenting = False  # Bool as to whether or not the user is currently writing comments using a '#'.
-        self._running = False  # Bool as to whether or not the calculator is currently running.
-
-    def start(self) -> None:
-        if self._running:  # Checks if this instance is already running. Raise if so.
-            raise RuntimeError('Calculator is already running!')
-
         print('You can now start interacting with the SRPN calculator')
-        self._running = True
-        self._loop()  # Enter blocking running loop.
 
-    def stop(self) -> None:
-        """When called, silently stops the calculator and resets any instance variables in case it is started again."""
-        self._running = False
+    def __call__(self, string_input: str) -> None:
+        """Called and handles the raw string input from command line."""
+        try:
+            user_input = UserInput(string_input)
+            # We need to split the raw string up into elements. Group numbers >9 together and clean up white space.
+            parsed_input = user_input.get_parsed_input()
+            # Process the input now it is nicely split up.
+            self._process_parsed_string(parsed_input)
+        except SRPNException as e:  # Something unexpected has happened if the program reaches here.
+            raise e
+
+    def reset(self) -> None:
+        """Resets any instance variables."""
         self._rng.reset()
         self._stack.clear()
         self._is_commenting = False
         return
-
-    def _loop(self) -> None:
-        """A loop which continues to wait for and process user input."""
-        try:
-            while self._running:
-                user_input = UserInput(input())
-                # We need to split the raw string up into elements. Group numbers >9 together and clean up white space.
-                parsed_input = user_input.get_parsed_input()
-                # Process the input now it is nicely split up.
-                self._process_parsed_string(parsed_input)
-        except KeyboardInterrupt:
-            self.stop()
-
-        except SRPNException as e:  # Something unexpected has happened if the program reaches here.
-            self.stop()
-            raise e
 
     def _process_parsed_string(self, parsed_string: StringStack) -> None:
         """Process an individual element that the user inputted."""
@@ -83,6 +62,7 @@ class SRPNCalculator:
         # Therefore we need to store what operators we have encountered and execute them afterwards.
         operator_chain = []
         for next_string in parsed_string:
+            print(f"{next_string}, {self._is_commenting}")
             try:
                 if current_string == '#':
                     if previous_string == ' ' and next_string == ' ':
@@ -158,5 +138,4 @@ class SRPNCalculator:
             print(e)
             self._stack.push_many((n1, n2))
             if isinstance(e, ModulusByZero):
-                self.stop()
                 sys.exit(0)
