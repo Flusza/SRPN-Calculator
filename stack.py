@@ -2,6 +2,7 @@ from __future__ import annotations
 import sys
 import typing
 import abc
+import types
 
 from c_integer import CInt
 from exceptions import (
@@ -40,7 +41,7 @@ class ABCStack(abc.ABC):
         """Keeps popping values from the top of the stack until no more values exist.
         `StopIteration` can be caught for when the stack empties."""
         try:
-            return self.pop(index=0)
+            return self.pop()
         except StackUnderflow:
             raise StopIteration()
 
@@ -175,3 +176,15 @@ class StringStack(ABCStack):
     """Used to represent a stack of strings."""
     stack_value_type = str
 
+    def __next__(self) -> stack_value_type:
+        """Unlike other stacks, we will allow iteration in this in reverse order through passing index=0 to pop().
+        This is to allow parsing input the correct way around."""
+        try:
+            return self.pop(index=0)
+        except StackUnderflow:
+            raise StopIteration()
+
+
+class OperatorStack(ABCStack):
+    """Used to represent a stack of mathematical operators to execute"""
+    stack_value_type = types.LambdaType

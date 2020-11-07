@@ -4,9 +4,9 @@ import sys
 
 from c_integer import CInt
 from random_number_generator import RandomNumberGenerator
-from stack import CIntStack, StringStack
+from stack import CIntStack, OperatorStack, StringStack
 from user_input import UserInput
-from utility import operator_map
+from utility import is_digit, operator_map
 from exceptions import (
     SRPNException,
     InvalidInput,
@@ -31,6 +31,7 @@ class SRPNCalculator:
     """
     def __init__(self, max_stack_size: int = None, rng_index: int = 0) -> None:
         self._stack = CIntStack(max_size=max_stack_size)
+        self._operator_stack = OperatorStack()
         self._rng = RandomNumberGenerator(index=rng_index)
         self._is_commenting = False  # Bool as to whether or not the user is currently writing comments using a '#'.
         print('You can now start interacting with the SRPN calculator')
@@ -50,17 +51,22 @@ class SRPNCalculator:
         """Resets any instance variables."""
         self._rng.reset()
         self._stack.clear()
+        self._operator_stack.clear()
         self._is_commenting = False
         return
 
     def _process_parsed_string(self, parsed_string: StringStack) -> None:
         """Process an individual element that the user inputted."""
+        # IMPORTANT NOTE! ----------------------------------------------------------------------------------------------
+        # There is strange functionality when mathematical operators are chained together with no white space.
+        # In any 'chain' of operators exists, the SRPN calculator executes them upon the next white space (or letter d).
+        # It also doesn't execute them in the same order. It does them in reverse
+        # (likely achieved through popping off the top of the stack, which will naturally do this).
+        # Furthermore, if an equals is in the chain, they are processed immediately, and the operations follow after.
+        # Therefore we need to store what operators we have encountered to execute them afterwards.
+        # --------------------------------------------------------------------------------------------------------------
         previous_string = ' '
         current_string = ' '
-        # There is strange functionality when a math operator proceeds an equals.
-        # In any 'chain' of operators and equals, the SRPN calculator executes all equals first and the operators after.
-        # Therefore we need to store what operators we have encountered and execute them afterwards.
-        operator_chain = []
         for next_string in parsed_string:
             try:
                 if current_string == '#':
@@ -75,9 +81,9 @@ class SRPNCalculator:
                     pass  # If we are commenting, we can ignore the input.
 
                 elif current_string == ' ':
-                    pass  # Do nothing
+                    pass  # Do nothing and don't raise an error.
 
-                elif current_string.isdigit():
+                elif is_digit(current_string):
                     self._stack.push(CInt(int(current_string)))
 
                 elif current_string == '=':
@@ -93,10 +99,7 @@ class SRPNCalculator:
                         print(item)
 
                 elif operator := operator_map.get(current_string):  # User inputted a mathematical symbol.
-                    if next_string != '=':  # Operator can do normal functionality
-                        self._process_operator(operator)
-                    else:  # Weird functionality when operator proceeds an equals.
-                        operator_chain.append(operator)
+                    self._operator_stack.push(operator)
 
                 else:  # If input reaches here, we can ignore it and make the user aware with this error.
                     raise InvalidInput(current_string)
@@ -107,24 +110,22 @@ class SRPNCalculator:
                 print(e)
             finally:
                 # End of each element, check if conditions are right to run the operator chain.
-                operator_chain = self._check_to_execute_operator_chain(next_string, operator_chain)
+                if len(self._operator_stack) > 0 and next_string in (' ', 'd'):
+                    self._execute_operator_stack()
+
                 # Update variables for the next iteration.
                 previous_string = current_string
                 current_string = next_string
 
-    def _check_to_execute_operator_chain(self, next_string: str, operator_chain: list) -> list:
+    def _execute_operator_stack(self) -> None:
         """Check if conditions are right to execute a chain of operators.
         Chains are created through a chain of operators and equal signs.
         """
         try:
-            if len(operator_chain) > 0:
-                if next_string in (' ', 'd'):
-                    for operator in operator_chain:
-                        self._process_operator(operator)
-                    operator_chain = []
+            for operator in self._operator_stack:
+                self._process_operator(operator)
         except StackException as e:
             print(e)
-        return operator_chain
 
     def _process_operator(self, operator: callable) -> None:
         """More specifically over processing an individual element, this processes a specific mathematical operator."""
