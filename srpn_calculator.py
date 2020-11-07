@@ -56,7 +56,7 @@ class SRPNCalculator:
         return
 
     def _process_parsed_string(self, parsed_string: StringStack) -> None:
-        """Process an individual element that the user inputted."""
+        """Process the user_input string. Requires the input to be split up first (UserInput.get_parsed_input())"""
         previous_string = ' '
         current_string = ' '
         for next_string in parsed_string:
@@ -129,4 +129,4 @@ class SRPNCalculator:
             print(e)
             self._stack.push_many((n1, n2))
             if isinstance(e, ModulusByZero):  # The SRPN calculator we're replicating crashes when doing modulus 0.
-                sys.exit(0)
+                sys.exit(1)
