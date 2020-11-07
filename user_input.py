@@ -40,6 +40,7 @@ class UserInput:
         Returns the list of parsed elements.
             """
         number_construct = ''
+        # We will use this variable to determine if a number is negative or if it is just a subtraction sign
         negative_val = False
         self._parsed_stack.push(' ')  # Append white space to start and end of input to make processing simpler later.
         for next_char in self._raw_string:

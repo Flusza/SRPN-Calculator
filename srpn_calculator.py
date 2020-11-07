@@ -57,14 +57,6 @@ class SRPNCalculator:
 
     def _process_parsed_string(self, parsed_string: StringStack) -> None:
         """Process an individual element that the user inputted."""
-        # IMPORTANT NOTE! ----------------------------------------------------------------------------------------------
-        # There is strange functionality when mathematical operators are chained together with no white space.
-        # In any 'chain' of operators exists, the SRPN calculator executes them upon the next white space (or letter d).
-        # It also doesn't execute them in the same order. It does them in reverse
-        # (likely achieved through popping off the top of the stack, which will naturally do this).
-        # Furthermore, if an equals is in the chain, they are processed immediately, and the operations follow after.
-        # Therefore we need to store what operators we have encountered to execute them afterwards.
-        # --------------------------------------------------------------------------------------------------------------
         previous_string = ' '
         current_string = ' '
         for next_string in parsed_string:
@@ -118,8 +110,7 @@ class SRPNCalculator:
                 current_string = next_string
 
     def _execute_operator_stack(self) -> None:
-        """Check if conditions are right to execute a chain of operators.
-        Chains are created through a chain of operators and equal signs.
+        """Sorts and executes the operator stack.
         """
         try:
             for operator in self._operator_stack:
@@ -129,7 +120,7 @@ class SRPNCalculator:
 
     def _process_operator(self, operator: callable) -> None:
         """More specifically over processing an individual element, this processes a specific mathematical operator."""
-        n1, n2 = self._stack.pop_many(2)  # Take the top two elements off the stack and apply the operator to them.
+        n1, n2 = self._stack.pop_many(2)
         try:
             self._stack.push(operator(n1, n2))
         except OperatorException as e:

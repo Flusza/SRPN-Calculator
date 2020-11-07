@@ -187,4 +187,4 @@ class StringStack(ABCStack):
 
 class OperatorStack(ABCStack):
     """Used to represent a stack of mathematical operators to execute"""
-    stack_value_type = types.LambdaType
+    stack_value_type = types.FunctionType
