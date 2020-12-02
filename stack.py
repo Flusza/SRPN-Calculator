@@ -161,7 +161,7 @@ class ABCStack(abc.ABC):
         return values
 
 
-class CIntStack(ABCStack):
+class ClampedIntStack(ABCStack):
     """Represents a stack of CInts."""
     stack_value_type = ClampedInt
 

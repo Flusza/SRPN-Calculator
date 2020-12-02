@@ -46,7 +46,7 @@ class StackEmpty(StackException):
 
 
 class OperatorException(SRPNException):
-    """Base exception class for exceptions which occur when using operators on the `CInt` class."""
+    """Base exception class for exceptions which occur when using operators on the `ClampedInt` class."""
     pass
 
 

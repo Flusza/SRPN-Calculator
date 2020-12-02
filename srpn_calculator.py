@@ -12,7 +12,7 @@ from exceptions import (
     StackOverflow
 )
 from random_number_generator import RandomNumberGenerator
-from stack import CIntStack, OperatorStack, StringStack
+from stack import ClampedIntStack, OperatorStack, StringStack
 from user_input import UserInput
 from utility import is_digit, operator_map
 
@@ -30,7 +30,7 @@ class SRPNCalculator:
         The index to start the `RandomNumberGenerator` on. Defaults to 0 (the start).
     """
     def __init__(self, max_stack_size: int = None, rng_index: int = 0) -> None:
-        self._stack = CIntStack(max_size=max_stack_size)
+        self._stack = ClampedIntStack(max_size=max_stack_size)
         self._operator_stack = OperatorStack()
         self._rng = RandomNumberGenerator(index=rng_index)
         self._is_commenting = False  # Bool as to whether or not the user is currently writing comments using a '#'.
