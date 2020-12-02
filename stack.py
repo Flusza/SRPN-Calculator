@@ -5,7 +5,7 @@ import sys
 import types
 import typing
 
-from c_integer import CInt
+from clamped_int import ClampedInt
 from exceptions import (
     StackOverflow,
     StackUnderflow,
@@ -163,12 +163,12 @@ class ABCStack(abc.ABC):
 
 class CIntStack(ABCStack):
     """Represents a stack of CInts."""
-    stack_value_type = CInt
+    stack_value_type = ClampedInt
 
     def show(self) -> typing.List[stack_value_type]:
         """Returns a list of values contained in the Stack."""
         if self.is_empty:  # Override normal functionality to return the minimum value instead of raising `StackEmpty`.
-            return [CInt(CInt.min_value), ]
+            return [ClampedInt(ClampedInt.min_value), ]
 
         return self._values
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 
-from c_integer import CInt
+from clamped_int import ClampedInt
 from exceptions import (
     SRPNException,
     InvalidInput,
@@ -76,7 +76,7 @@ class SRPNCalculator:
                     pass  # Do nothing and don't raise an error.
 
                 elif is_digit(current_string):
-                    self._stack.push(CInt(int(current_string)))
+                    self._stack.push(ClampedInt(int(current_string)))
 
                 elif current_string == '=':
                     print(self._stack.peek())
