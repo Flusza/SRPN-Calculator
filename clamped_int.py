@@ -24,7 +24,7 @@ class ClampedInt:
     @value.setter
     def value(self, v: int) -> None:
         """This setter ensures the value does not exceed the integer range specified by `max_value` & `min_value`.
-        Raises `ValueError should type not be an int, CInt or float."""
+        Raises `ValueError should type not be an int, ClampedInt or float."""
         if not isinstance(v, (int, ClampedInt, float)):
             raise ValueError('Inputted type is not an int.')
         self._value = int(max(ClampedInt.min_value, min(ClampedInt.max_value, v)))
@@ -38,34 +38,34 @@ class ClampedInt:
         return repr(self.value)
 
     def __add__(self, other: ClampedInt) -> ClampedInt:
-        """Returns the result from adding this CInt's value to the other CInt's value.
+        """Returns the result from adding this ClampedInt's value to the other ClampedInt's value.
         this + other
         """
         new_value = self.value + other.value
         return ClampedInt(new_value)
 
     def __sub__(self, other: ClampedInt) -> ClampedInt:
-        """Returns the result from subtracting this CInt's value by the other CInt's value.
+        """Returns the result from subtracting this ClampedInt's value by the other ClampedInt's value.
         this - other.
         """
         new_value = self.value - other.value
         return ClampedInt(new_value)
 
     def __mul__(self, other: ClampedInt) -> ClampedInt:
-        """Returns the multiplication product from this CInt's value and the other CInt's value.
+        """Returns the multiplication product from this ClampedInt's value and the other ClampedInt's value.
         this * other.
         """
         new_value = self.value * other.value
         return ClampedInt(new_value)
 
     def __truediv__(self, other: ClampedInt) -> ClampedInt:
-        """CInt can't handle true division (with a remainder value).
+        """ClampedInt can't handle true division (with a remainder value).
         If called, process as a floor division instead (no remainder).
         """
         return self.__floordiv__(other)
 
     def __floordiv__(self, other: ClampedInt) -> ClampedInt:
-        """Returns the whole number value when dividing this CInt's value by the other CInt's value.
+        """Returns the whole number value when dividing this ClampedInt's value by the other ClampedInt's value.
         Remainder is ignored.
         this // other.
         """
@@ -76,7 +76,7 @@ class ClampedInt:
         return ClampedInt(new_value)
 
     def __mod__(self, other: ClampedInt) -> ClampedInt:
-        """Returns the remainder from dividing this CInt's value by the other CInt's value.
+        """Returns the remainder from dividing this ClampedInt's value by the other ClampedInt's value.
         this % other.
         Raises `DivideByZero` should the denominator be == 0.
         """
@@ -87,7 +87,7 @@ class ClampedInt:
         return ClampedInt(new_value)
 
     def __pow__(self, other: ClampedInt) -> ClampedInt:
-        """Returns the resulting value after raising this CInt's value to the power denoted by the other CInt's value.
+        """Returns the resulting value after raising this ClampedInt's value to the power denoted by the other ClampedInt's value.
         this ^ other.
         Raises `NegativePower` should the other power be less than 0.
         """

@@ -51,21 +51,21 @@ class OperatorException(SRPNException):
 
 
 class NegativePower(OperatorException):
-    """Exception raised when a `CInt` is raised to a negative power."""
+    """Exception raised when a `ClampedInt` is raised to a negative power."""
     def __init__(self) -> None:
         message = 'Negative power.'
         super().__init__(message)
 
 
 class DivideByZero(OperatorException):
-    """Exception raised when a `CInt` is divided by 0."""
+    """Exception raised when a `ClampedInt` is divided by 0."""
     def __init__(self) -> None:
         message = 'Divide by 0.'
         super().__init__(message)
 
 
 class ModulusByZero(OperatorException):
-    """Exception raised when the modulus of 0 is taken by a `CInt`."""
+    """Exception raised when the modulus of 0 is taken by a `ClampedInt`."""
     def __init__(self):
         message = '113 Floating point exception(core dumped)'  # The calculator we're replicating crashes when mod 0.
         super().__init__(message)

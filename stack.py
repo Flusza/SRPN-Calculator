@@ -162,7 +162,7 @@ class ABCStack(abc.ABC):
 
 
 class ClampedIntStack(ABCStack):
-    """Represents a stack of CInts."""
+    """Represents a stack of ClampedInts."""
     stack_value_type = ClampedInt
 
     def show(self) -> typing.List[stack_value_type]:
