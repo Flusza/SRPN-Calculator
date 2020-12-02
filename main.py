@@ -1,5 +1,6 @@
-from srpn_calculator import SRPNCalculator
 import sys
+
+from srpn_calculator import SRPNCalculator
 
 
 def main() -> None:

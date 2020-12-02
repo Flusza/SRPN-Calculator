@@ -3,10 +3,6 @@ from __future__ import annotations
 import sys
 
 from c_integer import CInt
-from random_number_generator import RandomNumberGenerator
-from stack import CIntStack, OperatorStack, StringStack
-from user_input import UserInput
-from utility import is_digit, operator_map
 from exceptions import (
     SRPNException,
     InvalidInput,
@@ -15,6 +11,10 @@ from exceptions import (
     OperatorException,
     StackOverflow
 )
+from random_number_generator import RandomNumberGenerator
+from stack import CIntStack, OperatorStack, StringStack
+from user_input import UserInput
+from utility import is_digit, operator_map
 
 
 class SRPNCalculator:
