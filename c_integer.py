@@ -10,8 +10,6 @@ class CInt:
     Base 10 implementation of a C type Integer.
     Clamps value between max and min values, denoted by `cls.max_value` & `cls.min_value`.
     """
-    __slots__ = '_value'
-
     max_value = 2147483647
     min_value = -2147483648
 
