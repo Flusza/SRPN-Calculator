@@ -128,5 +128,3 @@ class SRPNCalculator:
             # However, we will print what went wrong to terminal to make user aware.
             print(e)
             self._stack.push_many((n1, n2))
-            if isinstance(e, ModulusByZero):  # The SRPN calculator we're replicating crashes when doing modulus 0.
-                sys.exit(1)
