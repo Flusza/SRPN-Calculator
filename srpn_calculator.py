@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-import sys
-
 from clamped_int import ClampedInt
 from exceptions import (
     SRPNException,
     InvalidInput,
-    ModulusByZero,
     StackException,
     OperatorException,
     StackOverflow
