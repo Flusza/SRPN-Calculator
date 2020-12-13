@@ -1,7 +1,7 @@
 __all__ = (
     "SRPNException", "InvalidInput", "ModulusByZero", "StackException",
     "StackOverflow", "StackUnderflow", "StackEmpty", "OperatorException",
-    "NegativePower", "DivideByZero"
+    "NegativePower", "DivideByZero", "ModulusByZero"
 )
 
 
